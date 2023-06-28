@@ -1,11 +1,28 @@
-import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native'
-import React from 'react'
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Keyboard } from 'react-native'
+import React, { useEffect, useRef, useState } from 'react'
 import { Ionicons, Feather } from '@expo/vector-icons';
 import { COLORS } from '../theme';
+import { EmitterSubscription } from 'react-native';
 
 const PromptForm = () => {
+  const [keyboardOffset, setKeyboardOffset] = useState(0);
+  const onKeyboardShow = event => setTimeout(() => {setKeyboardOffset(event.endCoordinates.height)}, 400);
+  const onKeyboardHide = () => setKeyboardOffset(0);
+  const keyboardDidShowListener = useRef<EmitterSubscription>();
+  const keyboardDidHideListener = useRef<EmitterSubscription>();
+
+  useEffect(() => {
+    keyboardDidShowListener.current = Keyboard.addListener('keyboardWillShow', onKeyboardShow);
+    keyboardDidHideListener.current = Keyboard.addListener('keyboardWillHide', onKeyboardHide);
+
+    return () => {
+      keyboardDidShowListener.current.remove();
+      keyboardDidHideListener.current.remove();
+    };
+  }, []);
+
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, {position: keyboardOffset === 0 ? 'relative' : 'absolute', bottom: keyboardOffset === 0 ? 0 : keyboardOffset}]}>
       <View style={styles.promptBox}>
         <TextInput
           style={styles.input}
