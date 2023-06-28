@@ -5,6 +5,7 @@ import { StatusBar } from 'expo-status-bar'
 import { Stack } from 'expo-router'
 import { FontAwesome5 } from '@expo/vector-icons';
 import PromptForm from '../components/PromptForm'
+import ResultCard from '../components/ResultCard'
 
 const options = {
   headerShown: true,
@@ -34,7 +35,11 @@ const index = () => {
       <Stack.Screen options={options} />
       <StatusBar style='dark' />
       <FlatList
+        data={['', '', '', '', '', '', '']}
         style={styles.flatlist}
+        keyExtractor={(_, i) => i}
+        renderItem={({item}) => <ResultCard />}
+        contentContainerStyle={{gap: 15}}
       />
       <PromptForm />
     </SafeAreaView>
@@ -77,6 +82,8 @@ const styles = StyleSheet.create({
   },
   flatlist: {
     flex: 1,
-    backgroundColor: '#F3F3F5'
+    backgroundColor: '#F3F3F5',
+    padding: 10,
+    paddingHorizontal: 16
   }
 })
