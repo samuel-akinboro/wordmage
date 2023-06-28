@@ -1,5 +1,5 @@
 import { Stack } from "expo-router";
-import { useFonts } from 'expo-fonts'
+import { useFonts } from 'expo-font'
 import { useEffect } from "react";
 
 export default function App() {
