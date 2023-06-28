@@ -22,12 +22,15 @@ const options = {
       <FontAwesome5 name="crown" size={12} color={COLORS.primary} />
       <Text style={styles.leftBtnText}>Premium</Text>
     </TouchableOpacity>
-  )
+  ),
+  headerStyle: {
+    backgroundColor: COLORS.white
+  }
 }
 
 const index = () => {
   return (
-    <SafeAreaView style={{flex: 1}}>
+    <SafeAreaView style={{flex: 1, backgroundColor: '#fff'}}>
       <Stack.Screen options={options} />
       <StatusBar style='dark' />
       <FlatList
@@ -73,6 +76,7 @@ const styles = StyleSheet.create({
     fontFamily: FONTS["500"]
   },
   flatlist: {
-    flex: 1
+    flex: 1,
+    backgroundColor: '#F3F3F5'
   }
 })
