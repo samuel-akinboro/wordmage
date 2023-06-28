@@ -40,6 +40,7 @@ const index = () => {
         keyExtractor={(_, i) => i}
         renderItem={({item}) => <ResultCard />}
         contentContainerStyle={{gap: 15}}
+        ListFooterComponent={<View style={{height: 10, backgroundColor: '#F3F3F5'}} />}
       />
       <PromptForm />
     </SafeAreaView>
