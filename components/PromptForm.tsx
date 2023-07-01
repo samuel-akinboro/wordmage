@@ -4,7 +4,13 @@ import { Ionicons, Feather } from '@expo/vector-icons';
 import { COLORS } from '../theme';
 import { EmitterSubscription } from 'react-native';
 
-const PromptForm = () => {
+interface Props {
+  query: string;
+  setQuery: (value: string) => void,
+  handleSubmit: () => void
+}
+
+const PromptForm = ({query, setQuery, handleSubmit}: Props) => {
   const [keyboardOffset, setKeyboardOffset] = useState(0);
   const onKeyboardShow = event => setTimeout(() => {setKeyboardOffset(event.endCoordinates.height)}, 400);
   const onKeyboardHide = () => setKeyboardOffset(0);
@@ -25,13 +31,20 @@ const PromptForm = () => {
     <View style={[styles.container, {position: keyboardOffset === 0 ? 'relative' : 'absolute', bottom: keyboardOffset === 0 ? 0 : keyboardOffset}]}>
       <View style={styles.promptBox}>
         <TextInput
+          value={query}
           style={styles.input}
+          onChangeText={(text) => setQuery(text)}
           placeholder='Enter prompt'
           placeholderTextColor={COLORS.gray}
         />
-        <Ionicons name="flash" size={14} color={COLORS.primary} />
+        <TouchableOpacity disabled>
+          <Ionicons name="flash" size={14} color={COLORS.primary} />
+        </TouchableOpacity>
       </View>
-      <TouchableOpacity style={styles.btn}>
+      <TouchableOpacity style={styles.btn} onPress={() => {
+        Keyboard.dismiss()
+        handleSubmit()
+      }}>
         <Feather name="send" size={20} color={COLORS.white} />
       </TouchableOpacity>
     </View>

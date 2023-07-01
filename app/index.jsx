@@ -1,11 +1,12 @@
 import { FlatList, StyleSheet, Text, TouchableOpacity, View, SafeAreaView } from 'react-native'
-import React from 'react'
+import React, { useState } from 'react'
 import { COLORS, FONTS } from '../theme'
 import { StatusBar } from 'expo-status-bar'
 import { Stack } from 'expo-router'
 import { FontAwesome5 } from '@expo/vector-icons';
 import PromptForm from '../components/PromptForm'
 import ResultCard from '../components/ResultCard'
+import omniiferApi from '../api/omniinfer'
 
 const options = {
   headerShown: true,
@@ -30,6 +31,48 @@ const options = {
 }
 
 const index = () => {
+  const [query, setQuery] = useState('');
+  const [imageResult, setImageResult] = useState([])
+
+  const handleSubmit = () => {
+    omniiferApi.post('/txt2img', {
+      "negative_prompt": "nsfw, ng_deepnegative_v1_75t, badhandv4, (worst quality:2), (low quality:2), (normal quality:2), lowres, ((monochrome)), ((grayscale)), watermark",
+      "sampler_name": "DPM++ 2M Karras",
+      "batch_size": 1,
+      "n_iter": 1,
+      "steps": 20,
+      "cfg_scale": 7,
+      "seed": -1,
+      "height": 1024,
+      "width": 768,
+      "model_name": "majicmixRealistic_v4_40121.safetensors",
+      "prompt": "Best quality, masterpiece, ultra high res, (photorealistic:1.4), raw photo, 1girl, offshoulder, in the dark, deep shadow"
+    })
+    .then(response => {
+      const taskId = response.data.data.task_id;
+      // fetch image
+      fetchImage(taskId)
+    })
+    .catch(error => console.log(error))
+
+  }
+
+  const fetchImage = (taskId) => {
+    omniiferApi.get('/progress', {
+      params: {
+        task_id: taskId
+      }
+    })
+    .then((res) => {
+      if(res.data.data.imgs === null) {
+        fetchImage(taskId)
+      }else{
+        console.log(res.data.data)
+      }
+    })
+    .catch(error => console.log(error))
+  }
+
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: '#fff'}}>
       <Stack.Screen options={options} />
@@ -43,7 +86,11 @@ const index = () => {
         showsVerticalScrollIndicator={false}
         ListFooterComponent={<View style={{height: 10, backgroundColor: '#F3F3F5'}} />}
       />
-      <PromptForm />
+      <PromptForm 
+        query={query} 
+        setQuery={setQuery} 
+        handleSubmit={handleSubmit} 
+      />
     </SafeAreaView>
   )
 }
