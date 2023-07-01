@@ -3,12 +3,18 @@ import React from 'react'
 import { COLORS, FONTS, SIZES } from '../theme'
 import { Feather } from '@expo/vector-icons';
 
-const ResultCard = () => {
+interface Props {
+  uri: string;
+  prompt: string
+}
+
+const ResultCard = ({uri, prompt}: Props) => {
+  console.log(prompt)
   return (
     <View style={styles.container}>
-      <Text style={styles.prompt}>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Eveniet, nesciunt laboriosam. Aliquid sed distinctio laboriosam, in quis dolores, repellat nesciunt odio tempora explicabo accusamus dolorum odit reprehenderit aut. Voluptates, tenetur.</Text>
+      <Text style={styles.prompt}>{prompt}</Text>
       <Image 
-        source={require('../assets/images/image1.jpeg')}
+        source={uri ? {uri} : require('../assets/images/image1.jpeg')}
         style={styles.image}
       />
       <View style={styles.footer}>

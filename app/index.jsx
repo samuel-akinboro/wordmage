@@ -1,5 +1,5 @@
 import { FlatList, StyleSheet, Text, TouchableOpacity, View, SafeAreaView } from 'react-native'
-import React, { useState } from 'react'
+import React, { Fragment, useState } from 'react'
 import { COLORS, FONTS } from '../theme'
 import { StatusBar } from 'expo-status-bar'
 import { Stack } from 'expo-router'
@@ -7,6 +7,7 @@ import { FontAwesome5 } from '@expo/vector-icons';
 import PromptForm from '../components/PromptForm'
 import ResultCard from '../components/ResultCard'
 import omniiferApi from '../api/omniinfer'
+import Toast from 'react-native-toast-message';
 
 const options = {
   headerShown: true,
@@ -53,7 +54,18 @@ const index = () => {
       // fetch image
       fetchImage(taskId)
     })
-    .catch(error => console.log(error))
+    .catch(error => {
+      console.log(error)
+      if(error?.message?.includes('429')){
+        Toast.show({
+          type: 'error', // 'success', 'error', 'info', or 'none'
+          text1: 'Too many requests',
+          text2: 'Try again later',
+          visibilityTime: 3000, // Duration to show the toast (in milliseconds)
+          autoHide: true, // Hide the toast automatically after visibilityTime
+        });
+      }
+    })
 
   }
 
@@ -67,31 +79,37 @@ const index = () => {
       if(res.data.data.imgs === null) {
         fetchImage(taskId)
       }else{
-        console.log(res.data.data)
+        setImageResult([...imageResult, {
+          uri: res.data.data.imgs[0],
+          prompt: JSON.parse(res.data.data.info).prompt
+        }])
       }
     })
     .catch(error => console.log(error))
   }
 
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: '#fff'}}>
-      <Stack.Screen options={options} />
-      <StatusBar style='dark' />
-      <FlatList
-        data={['', '', '', '', '', '', '']}
-        style={styles.flatlist}
-        keyExtractor={(_, i) => i}
-        renderItem={({item}) => <ResultCard />}
-        contentContainerStyle={{gap: 15}}
-        showsVerticalScrollIndicator={false}
-        ListFooterComponent={<View style={{height: 10, backgroundColor: '#F3F3F5'}} />}
-      />
-      <PromptForm 
-        query={query} 
-        setQuery={setQuery} 
-        handleSubmit={handleSubmit} 
-      />
-    </SafeAreaView>
+    <Fragment>
+      <SafeAreaView style={{flex: 1, backgroundColor: '#fff'}}>
+        <Stack.Screen options={options} />
+        <StatusBar style='dark' />
+        <FlatList
+          data={imageResult}
+          style={styles.flatlist}
+          keyExtractor={(_, i) => i}
+          renderItem={({item}) => <ResultCard uri={item.uri} prompt={item.prompt} />}
+          contentContainerStyle={{gap: 15}}
+          showsVerticalScrollIndicator={false}
+          ListFooterComponent={<View style={{height: 10, backgroundColor: '#F3F3F5'}} />}
+        />
+        <PromptForm 
+          query={query} 
+          setQuery={setQuery} 
+          handleSubmit={handleSubmit} 
+        />
+      </SafeAreaView>
+      <Toast />
+    </Fragment>
   )
 }
 
