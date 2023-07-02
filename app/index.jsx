@@ -33,10 +33,11 @@ const options = {
 
 const index = () => {
   const [query, setQuery] = useState('');
-  const [imageResult, setImageResult] = useState([]);
-  const [loading, setLoading] = useState(true)
+  const [imageResult, setImageResult] = useState(['']);
+  const [loading, setLoading] = useState(false)
 
   const handleSubmit = () => {
+    setLoading(true)
     omniiferApi.post('/txt2img', {
       "negative_prompt": "nsfw, ng_deepnegative_v1_75t, badhandv4, (worst quality:2), (low quality:2), (normal quality:2), lowres, ((monochrome)), ((grayscale)), watermark",
       "sampler_name": "DPM++ 2M Karras",
@@ -80,10 +81,14 @@ const index = () => {
       if(res.data.data.imgs === null) {
         fetchImage(taskId)
       }else{
+        console.log(taskId)
+        console.log(res.data.data)
         setImageResult([...imageResult, {
+          task_id: taskId,
           uri: res.data.data.imgs[0],
           prompt: JSON.parse(res.data.data.info).prompt
         }])
+        setLoading(false)
       }
     })
     .catch(error => console.log(error))
@@ -98,7 +103,7 @@ const index = () => {
           data={imageResult}
           style={styles.flatlist}
           keyExtractor={(_, i) => i}
-          renderItem={({item}) => <ResultCard uri={item.uri} prompt={item.prompt} />}
+          renderItem={({item}) => <ResultCard uri={item.uri} prompt={item.prompt} taskId={item.task_id} />}
           contentContainerStyle={{gap: 15}}
           showsVerticalScrollIndicator={false}
           ListFooterComponent={<View style={{height: 10, backgroundColor: '#F3F3F5'}} />}
