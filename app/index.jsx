@@ -3,7 +3,7 @@ import React, { Fragment, useContext, useState } from 'react'
 import { COLORS, FONTS } from '../theme'
 import { StatusBar } from 'expo-status-bar'
 import { Stack } from 'expo-router'
-import { FontAwesome5 } from '@expo/vector-icons';
+import { FontAwesome5, Foundation } from '@expo/vector-icons';
 import PromptForm from '../components/PromptForm'
 import ResultCard from '../components/ResultCard'
 import omniiferApi from '../api/omniinfer'
@@ -34,7 +34,7 @@ const options = {
 }
 
 const index = () => {
-  const [query, setQuery] = useState('1girl, offshoulder, in the dark, deep shadow');
+  const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
 
   const [images, dispatch] = useContext(GeneratedImagesContext)
@@ -100,8 +100,13 @@ const index = () => {
           style={styles.flatlist}
           keyExtractor={(_, i) => i}
           renderItem={({item}) => <ResultCard uri={item?.uri} prompt={item?.prompt} taskId={item?.task_id} />}
-          contentContainerStyle={{gap: 15}}
+          contentContainerStyle={{gap: 15, flex: 1}}
           showsVerticalScrollIndicator={false}
+          ListEmptyComponent={(
+            <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+              <Foundation name="lightbulb" size={84} color={COLORS.primary} />
+            </View>
+          )}
           ListFooterComponent={<View style={{height: 10, backgroundColor: '#F3F3F5'}} />}
         />
         <PromptForm 
