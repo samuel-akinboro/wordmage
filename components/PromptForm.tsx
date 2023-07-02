@@ -137,7 +137,8 @@ const styles = StyleSheet.create({
     padding: 10,
     paddingHorizontal: 15,
     borderRadius: 20,
-    borderColor: COLORS.lightgray
+    borderColor: COLORS.lightgray,
+    gap: 5
   },
   input: {
     flex: 1,

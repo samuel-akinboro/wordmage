@@ -1,6 +1,7 @@
 import { Stack } from "expo-router";
 import { useFonts } from 'expo-font'
 import { useEffect } from "react";
+import GeneratedImagesProvider from "../providers/generatedImages";
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -22,7 +23,8 @@ export default function App() {
   }
 
   return (
-    <Stack
+    <GeneratedImagesProvider>
+      <Stack
       initialRouteName="index"
       screenOptions={{
         headerShown: false
@@ -30,5 +32,6 @@ export default function App() {
     >
       <Stack.Screen name='index' />
     </Stack>
+    </GeneratedImagesProvider>
   )
 }

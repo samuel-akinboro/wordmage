@@ -1,8 +1,10 @@
 import { Image, StyleSheet, Text, View, TouchableOpacity, Animated } from 'react-native'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import { COLORS, FONTS, SIZES } from '../theme'
 import { Feather } from '@expo/vector-icons';
 import omniiferApi from '../api/omniinfer';
+import { GeneratedImagesContext } from '../providers/generatedImages';
+import { addImage } from '../actions/generatedImageActions';
 
 function LoadingIndicator() {
   const animatedValue = useRef(new Animated.Value(0)).current
@@ -88,32 +90,35 @@ interface Props {
 
 const ResultCard = ({uri, prompt, taskId}: Props) => {
   const [loading, setLoading] = useState(false);
+  const [_, dispatch] = useContext(GeneratedImagesContext);
 
-  // const fetchImage = (taskId) => {
-  //   omniiferApi.get('/progress', {
-  //     params: {
-  //       task_id: taskId
-  //     }
-  //   })
-  //   .then((res) => {
-  //     if(res.data.data.imgs === null) {
-  //       fetchImage(taskId)
-  //     }else{
-  //       console.log(res.data.data)
-  //       setImageResult([...imageResult, {
-  //         task_id: taskId,
-  //         uri: res.data.data.imgs[0],
-  //         prompt: JSON.parse(res.data.data.info).prompt
-  //       }])
-  //       setLoading(false)
-  //     }
-  //   })
-  //   .catch(error => console.log(error))
-  // }
+  const fetchImage = (taskId: string) => {
+    omniiferApi.get('/progress', {
+      params: {
+        task_id: taskId
+      }
+    })
+    .then((res) => {
+      if(res?.data?.data?.imgs == null) {
+        fetchImage(taskId)
+      }else{
+        const payload = {
+          id: taskId,
+          uri: res?.data?.data?.imgs[0]
+        }
+        dispatch(addImage(payload))
+        setLoading(false)
+      }
+    })
+    .catch(error => console.log(error))
+  }
 
   useEffect(() => {
-    // console.log(taskId)
-  }, [])
+    if(!uri) {
+      setLoading(true);
+      fetchImage(taskId)
+    } 
+  }, [uri])
 
   return (
     <View style={styles.container}>

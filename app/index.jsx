@@ -1,5 +1,5 @@
 import { FlatList, StyleSheet, Text, TouchableOpacity, View, SafeAreaView } from 'react-native'
-import React, { Fragment, useState } from 'react'
+import React, { Fragment, useContext, useState } from 'react'
 import { COLORS, FONTS } from '../theme'
 import { StatusBar } from 'expo-status-bar'
 import { Stack } from 'expo-router'
@@ -8,6 +8,8 @@ import PromptForm from '../components/PromptForm'
 import ResultCard from '../components/ResultCard'
 import omniiferApi from '../api/omniinfer'
 import Toast from 'react-native-toast-message';
+import { GeneratedImagesContext } from '../providers/generatedImages'
+import { generateNewImage } from '../actions/generatedImageActions'
 
 const options = {
   headerShown: true,
@@ -32,9 +34,10 @@ const options = {
 }
 
 const index = () => {
-  const [query, setQuery] = useState('');
-  const [imageResult, setImageResult] = useState(['']);
-  const [loading, setLoading] = useState(false)
+  const [query, setQuery] = useState('1girl, offshoulder, in the dark, deep shadow');
+  const [loading, setLoading] = useState(false);
+
+  const [images, dispatch] = useContext(GeneratedImagesContext)
 
   const handleSubmit = () => {
     setLoading(true)
@@ -49,14 +52,20 @@ const index = () => {
       "height": 1024,
       "width": 768,
       "model_name": "majicmixRealistic_v4_40121.safetensors",
-      "prompt": "Best quality, masterpiece, ultra high res, (photorealistic:1.4), raw photo, 1girl, offshoulder, in the dark, deep shadow"
+      "prompt": `Best quality, masterpiece, ultra high res, (photorealistic:1.4), raw photo, ${query}`
     })
     .then(response => {
       const taskId = response.data.data.task_id;
-      // fetch image
-      fetchImage(taskId)
+      const payload = {
+        task_id: taskId,
+        prompt: query
+      }
+      dispatch(generateNewImage(payload))
+      setQuery('')
+      setLoading(false)
     })
     .catch(error => {
+      setLoading(false)
       console.log(error)
       if(error?.message?.includes('429')){
         Toast.show({
@@ -66,32 +75,19 @@ const index = () => {
           visibilityTime: 3000, // Duration to show the toast (in milliseconds)
           autoHide: true, // Hide the toast automatically after visibilityTime
         });
-      }
-    })
-
-  }
-
-  const fetchImage = (taskId) => {
-    omniiferApi.get('/progress', {
-      params: {
-        task_id: taskId
-      }
-    })
-    .then((res) => {
-      if(res.data.data.imgs === null) {
-        fetchImage(taskId)
+      }else if(error?.message?.toLowerCase().includes('network error')){
+        Toast.show({
+          type: 'error', // 'success', 'error', 'info', or 'none'
+          text1: 'Network error',
+          text2: 'Turn on internet',
+          visibilityTime: 3000, // Duration to show the toast (in milliseconds)
+          autoHide: true, // Hide the toast automatically after visibilityTime
+        });
       }else{
-        console.log(taskId)
-        console.log(res.data.data)
-        setImageResult([...imageResult, {
-          task_id: taskId,
-          uri: res.data.data.imgs[0],
-          prompt: JSON.parse(res.data.data.info).prompt
-        }])
-        setLoading(false)
+        console.log(error.message)
       }
     })
-    .catch(error => console.log(error))
+
   }
 
   return (
@@ -100,10 +96,10 @@ const index = () => {
         <Stack.Screen options={options} />
         <StatusBar style='dark' />
         <FlatList
-          data={imageResult}
+          data={images.result}
           style={styles.flatlist}
           keyExtractor={(_, i) => i}
-          renderItem={({item}) => <ResultCard uri={item.uri} prompt={item.prompt} taskId={item.task_id} />}
+          renderItem={({item}) => <ResultCard uri={item?.uri} prompt={item?.prompt} taskId={item?.task_id} />}
           contentContainerStyle={{gap: 15}}
           showsVerticalScrollIndicator={false}
           ListFooterComponent={<View style={{height: 10, backgroundColor: '#F3F3F5'}} />}
