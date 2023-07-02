@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Keyboard } from 'react-native'
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Keyboard, Animated } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import { Ionicons, Feather } from '@expo/vector-icons';
 import { COLORS } from '../theme';
@@ -9,6 +9,63 @@ interface Props {
   setQuery: (value: string) => void,
   handleSubmit: () => void,
   loading: boolean
+}
+
+function LoadingIndicator() {
+  const animationValue = useRef(new Animated.Value(0)).current
+
+  const dotStyle = {
+    height: 8,
+    width: 8,
+    borderRadius: 8,
+    backgroundColor: COLORS.primary
+  }
+
+  useEffect(() => {
+    Animated.loop(
+      Animated.timing(animationValue, {
+        toValue: 1,
+        duration: 900,
+        useNativeDriver: true
+      })
+    ).start()
+  }, [])
+
+  return (
+    <View style={{
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 5
+    }}>
+      <Animated.View 
+        style={[
+          dotStyle, 
+          {transform: [{translateY: animationValue.interpolate({
+            inputRange: [0, 0.5, 1],
+            outputRange: [-3, 0, -3]
+          })}]}
+        ]} 
+        />
+      <Animated.View 
+        style={[
+          dotStyle, 
+          {transform: [{translateY: animationValue.interpolate({
+            inputRange: [0, 0.5, 1],
+            outputRange: [0, -3, 0]
+          })}]}
+        ]} 
+      />
+      <Animated.View 
+        style={[
+          dotStyle, 
+          {transform: [{translateY: animationValue.interpolate({
+            inputRange: [0, 0.5, 1],
+            outputRange: [-3, 0, -3]
+          })}]}
+        ]} 
+      />
+    </View>
+  )
 }
 
 const PromptForm = ({query, setQuery, handleSubmit, loading}: Props) => {
@@ -38,9 +95,15 @@ const PromptForm = ({query, setQuery, handleSubmit, loading}: Props) => {
           placeholder='Enter prompt'
           placeholderTextColor={COLORS.gray}
         />
-        <TouchableOpacity disabled>
-          <Ionicons name="flash" size={14} color={COLORS.primary} />
-        </TouchableOpacity>
+        {
+          !loading ? 
+            (
+              <TouchableOpacity disabled>
+                <Ionicons name="flash" size={14} color={COLORS.primary} />
+              </TouchableOpacity>
+            ) : 
+            <LoadingIndicator />
+        }
       </View>
       <TouchableOpacity 
         style={[styles.btn, {opacity: loading ? 0.5 : 1}]} 
