@@ -7,10 +7,11 @@ import { EmitterSubscription } from 'react-native';
 interface Props {
   query: string;
   setQuery: (value: string) => void,
-  handleSubmit: () => void
+  handleSubmit: () => void,
+  loading: boolean
 }
 
-const PromptForm = ({query, setQuery, handleSubmit}: Props) => {
+const PromptForm = ({query, setQuery, handleSubmit, loading}: Props) => {
   const [keyboardOffset, setKeyboardOffset] = useState(0);
   const onKeyboardShow = event => setTimeout(() => {setKeyboardOffset(event.endCoordinates.height)}, 400);
   const onKeyboardHide = () => setKeyboardOffset(0);
@@ -41,10 +42,14 @@ const PromptForm = ({query, setQuery, handleSubmit}: Props) => {
           <Ionicons name="flash" size={14} color={COLORS.primary} />
         </TouchableOpacity>
       </View>
-      <TouchableOpacity style={styles.btn} onPress={() => {
-        Keyboard.dismiss()
-        handleSubmit()
-      }}>
+      <TouchableOpacity 
+        style={[styles.btn, {opacity: loading ? 0.5 : 1}]} 
+        onPress={() => {
+          Keyboard.dismiss()
+          handleSubmit()
+        }}
+        disabled={loading}
+      >
         <Feather name="send" size={20} color={COLORS.white} />
       </TouchableOpacity>
     </View>

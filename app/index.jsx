@@ -33,7 +33,8 @@ const options = {
 
 const index = () => {
   const [query, setQuery] = useState('');
-  const [imageResult, setImageResult] = useState([])
+  const [imageResult, setImageResult] = useState([]);
+  const [loading, setLoading] = useState(true)
 
   const handleSubmit = () => {
     omniiferApi.post('/txt2img', {
@@ -105,6 +106,7 @@ const index = () => {
         <PromptForm 
           query={query} 
           setQuery={setQuery} 
+          loading={loading}
           handleSubmit={handleSubmit} 
         />
       </SafeAreaView>
