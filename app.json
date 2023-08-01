@@ -5,6 +5,16 @@
       "bundler": "metro"
     },
     "name": "wordmage",
-    "slug": "wordmage"
+    "slug": "wordmage",
+    "plugins": [
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "Allow wordmage to access your photos.",
+          "savePhotosPermission": "Allow wordmage to save photos.",
+          "isAccessMediaLocationEnabled": true
+        }
+      ]
+    ]
   }
 }

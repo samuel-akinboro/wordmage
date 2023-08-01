@@ -100,7 +100,7 @@ const index = () => {
           style={styles.flatlist}
           keyExtractor={(_, i) => i}
           renderItem={({item}) => <ResultCard uri={item?.uri} prompt={item?.prompt} taskId={item?.task_id} />}
-          contentContainerStyle={{gap: 15, flex: 1}}
+          contentContainerStyle={{gap: 15, flex: images.result.length == 0 && 1}}
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={(
             <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>

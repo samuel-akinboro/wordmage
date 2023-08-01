@@ -5,6 +5,9 @@ import { Feather } from '@expo/vector-icons';
 import omniiferApi from '../api/omniinfer';
 import { GeneratedImagesContext } from '../providers/generatedImages';
 import { addImage } from '../actions/generatedImageActions';
+import * as FileSystem from 'expo-file-system';
+import * as MediaLibrary from 'expo-media-library';
+import moment from 'moment';
 
 function LoadingIndicator() {
   const animatedValue = useRef(new Animated.Value(0)).current
@@ -120,6 +123,36 @@ const ResultCard = ({uri, prompt, taskId}: Props) => {
     } 
   }, [uri])
 
+  const imageUrl = uri;
+
+const handleDownload = async () => {
+    if(imageUrl){
+      let date = moment().format('YYYYMMDDhhmmss')
+      let fileUri = FileSystem.documentDirectory + `${date}.jpg`;
+      try {
+          const res = await FileSystem.downloadAsync(imageUrl, fileUri)
+          saveFile(res.uri)
+      } catch (err) {
+          console.log("FS Err: ", err)
+      }
+    }
+}
+
+const saveFile = async (uri) => {
+  try {
+    // Request device storage access permission
+    const { status } = await MediaLibrary.requestPermissionsAsync();
+    if (status === "granted") {
+    // Save image to media library
+      await MediaLibrary.saveToLibraryAsync(uri);
+
+      console.log("Image successfully saved");
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
   return (
     <View style={styles.container}>
       <Text style={styles.prompt}>{prompt}</Text>
@@ -138,7 +171,7 @@ const ResultCard = ({uri, prompt, taskId}: Props) => {
             <Feather name="refresh-cw" size={11} color={COLORS.white} />
           </View>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.footerBtn}>
+        <TouchableOpacity style={styles.footerBtn} onPress={handleDownload}>
           <View style={styles.footerBtnIconContainer}>
             <Feather name="arrow-down" size={12} color={COLORS.white} />
           </View>
