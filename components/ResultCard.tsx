@@ -1,4 +1,4 @@
-import { Image, StyleSheet, Text, View, TouchableOpacity, Animated } from 'react-native'
+import { Image, StyleSheet, Text, View, TouchableOpacity, Animated, ActivityIndicator } from 'react-native'
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import { COLORS, FONTS, SIZES } from '../theme'
 import { Feather } from '@expo/vector-icons';
@@ -94,6 +94,7 @@ interface Props {
 const ResultCard = ({uri, prompt, taskId}: Props) => {
   const [loading, setLoading] = useState(false);
   const [_, dispatch] = useContext(GeneratedImagesContext);
+  const [isDownloading, setIsDownloading] = useState(false)
 
   const fetchImage = (taskId: string) => {
     omniiferApi.get('/progress', {
@@ -127,6 +128,7 @@ const ResultCard = ({uri, prompt, taskId}: Props) => {
 
 const handleDownload = async () => {
     if(imageUrl){
+      setIsDownloading(true)
       let date = moment().format('YYYYMMDDhhmmss')
       let fileUri = FileSystem.documentDirectory + `${date}.jpg`;
       try {
@@ -134,6 +136,7 @@ const handleDownload = async () => {
           saveFile(res.uri)
       } catch (err) {
           console.log("FS Err: ", err)
+          setIsDownloading(false)
       }
     }
 }
@@ -145,10 +148,11 @@ const saveFile = async (uri) => {
     if (status === "granted") {
     // Save image to media library
       await MediaLibrary.saveToLibraryAsync(uri);
-
+      setIsDownloading(false)
       console.log("Image successfully saved");
     }
   } catch (error) {
+    setIsDownloading(false)
     console.log(error);
   }
 };
@@ -171,9 +175,9 @@ const saveFile = async (uri) => {
             <Feather name="refresh-cw" size={11} color={COLORS.white} />
           </View>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.footerBtn} onPress={handleDownload}>
+        <TouchableOpacity style={styles.footerBtn} onPress={handleDownload} disabled={isDownloading}>
           <View style={styles.footerBtnIconContainer}>
-            <Feather name="arrow-down" size={12} color={COLORS.white} />
+            {!isDownloading ? <Feather name="arrow-down" size={12} color={COLORS.white} /> : <ActivityIndicator size={12} />}
           </View>
         </TouchableOpacity>
       </View>
