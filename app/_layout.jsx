@@ -25,13 +25,13 @@ export default function App() {
   return (
     <GeneratedImagesProvider>
       <Stack
-      initialRouteName="index"
-      screenOptions={{
-        headerShown: false
-      }}
-    >
-      <Stack.Screen name='index' />
-    </Stack>
+        initialRouteName="index"
+        screenOptions={{
+          headerShown: false
+        }}
+      >
+        <Stack.Screen name='index' />
+      </Stack>
     </GeneratedImagesProvider>
   )
 }

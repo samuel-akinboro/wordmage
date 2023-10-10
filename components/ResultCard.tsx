@@ -8,6 +8,7 @@ import { addImage } from '../actions/generatedImageActions';
 import * as FileSystem from 'expo-file-system';
 import * as MediaLibrary from 'expo-media-library';
 import moment from 'moment';
+import saveToStorage from '../utility/saveToStorage';
 
 function LoadingIndicator() {
   const animatedValue = useRef(new Animated.Value(0)).current
@@ -110,6 +111,8 @@ const ResultCard = ({uri, prompt, taskId}: Props) => {
           id: taskId,
           uri: res?.data?.data?.imgs[0]
         }
+
+        saveToStorage({...payload, prompt})
         dispatch(addImage(payload))
         setLoading(false)
       }

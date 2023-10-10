@@ -1,3 +1,5 @@
+import { fetchStorageImages } from "../utility/saveToStorage";
+
 interface NewImage {
   task_id: string;
   prompt: string;
@@ -22,3 +24,21 @@ export const addImage = (payload: AddImage) => {
     payload
   }
 }
+
+export const fetchImagesInStorage = async (dispatch) => {
+  try {
+    const images = await fetchStorageImages(); 
+    dispatch({
+      type: 'FETCH_IMAGES_IN_STORAGE',
+      payload: images,
+    });
+  } catch (error) {
+    // Handle any errors and dispatch an error action if needed
+    console.log('error fetching data from storage', error)
+  }
+};
+
+
+
+
+

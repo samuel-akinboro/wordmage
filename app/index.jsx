@@ -1,5 +1,5 @@
 import { FlatList, StyleSheet, Text, TouchableOpacity, View, SafeAreaView } from 'react-native'
-import React, { Fragment, useContext, useState } from 'react'
+import React, { Fragment, useContext, useEffect, useState } from 'react'
 import { COLORS, FONTS } from '../theme'
 import { StatusBar } from 'expo-status-bar'
 import { Stack } from 'expo-router'
@@ -9,7 +9,7 @@ import ResultCard from '../components/ResultCard'
 import omniiferApi from '../api/omniinfer'
 import Toast from 'react-native-toast-message';
 import { GeneratedImagesContext } from '../providers/generatedImages'
-import { generateNewImage } from '../actions/generatedImageActions'
+import { fetchImagesInStorage, generateNewImage } from '../actions/generatedImageActions'
 
 const options = {
   headerShown: true,
@@ -36,8 +36,11 @@ const options = {
 const index = () => {
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
+  const [images, dispatch] = useContext(GeneratedImagesContext);
 
-  const [images, dispatch] = useContext(GeneratedImagesContext)
+  useEffect(() => {
+    fetchImagesInStorage(dispatch)
+  }, [])
 
   const handleSubmit = () => {
     setLoading(true)

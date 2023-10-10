@@ -22,6 +22,8 @@ const reducer = (state, action) => {
       })
 
       return {...state, result: newResult}
+    case "FETCH_IMAGES_IN_STORAGE":
+      return {...state, result: action.payload}
     default:
       return state;
   }
